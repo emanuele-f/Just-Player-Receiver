@@ -18,5 +18,6 @@ public class MainActivity extends Activity {
 
         Intent intent = new Intent(getApplicationContext(), MainService.class);
         ContextCompat.startForegroundService(this, intent);
+        finish();
     }
 }

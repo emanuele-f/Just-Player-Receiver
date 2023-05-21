@@ -1,0 +1,28 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.emanuelef.justplayerreceiver'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.emanuelef.justplayerreceiver"
+        minSdk 21
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.leanback:leanback:1.0.0'
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+}

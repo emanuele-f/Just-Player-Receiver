@@ -11,6 +11,7 @@ import android.net.nsd.NsdServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -22,12 +23,22 @@ public class MainService extends Service {
     private static final String NOTIFY_CHAN_MAIN = "main";
     private static final int HTTP_PORT = 8028;
 
+    private String mRegisteredMdnsName;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
         startForeground(1, getNotification());
         registerMdnsService();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if(mRegisteredMdnsName != null)
+            Toast.makeText(MainService.this, mRegisteredMdnsName, Toast.LENGTH_LONG).show();
+
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Nullable
@@ -69,10 +80,14 @@ public class MainService extends Service {
         service.setServiceType("_http._tcp");
         service.setPort(HTTP_PORT);
 
+        String mdns_name = service.getServiceName() + ".local";
+
         NsdManager.RegistrationListener listener = new NsdManager.RegistrationListener() {
             @Override
             public void onServiceRegistered(NsdServiceInfo serviceInfo) {
                 Log.i(TAG, "Service registered");
+                mRegisteredMdnsName = mdns_name;
+                Toast.makeText(MainService.this, mdns_name, Toast.LENGTH_LONG).show();
 
                 HttpReceiver receiver = new HttpReceiver(MainService.this, HTTP_PORT);
                 try {
@@ -105,7 +120,7 @@ public class MainService extends Service {
 
         NsdManager nsdManager = (NsdManager) getSystemService(Context.NSD_SERVICE);
 
-        Log.i(TAG, "Registering MDNS service " + service.getServiceName() + ".local");
+        Log.i(TAG, "Registering MDNS service " + mdns_name);
         nsdManager.registerService(service, NsdManager.PROTOCOL_DNS_SD, listener);
     }
 }
